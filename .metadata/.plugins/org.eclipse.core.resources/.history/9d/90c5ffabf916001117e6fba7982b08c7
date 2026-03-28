@@ -1,0 +1,14 @@
+package com.wonderverse.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class AuthResponse {
+    public AuthResponse(String token, String name) {
+		// TODO Auto-generated constructor stub
+	}
+	private String accessToken;
+    private String role;
+}

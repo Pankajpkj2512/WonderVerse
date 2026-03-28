@@ -1,0 +1,52 @@
+package com.wonderverse.service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.wonderverse.dto.AuthRequest;
+import com.wonderverse.dto.AuthResponse;
+import com.wonderverse.entity.User;
+import com.wonderverse.repository.UserRepository;
+import com.wonderverse.util.JwtUtil;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    public AuthResponse register(AuthRequest request) {
+        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.PARENT)
+                .build();
+
+        userRepository.save(user);
+
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
+        return new AuthResponse(token, user.getRole().name());
+    }
+
+    public AuthResponse login(AuthRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new RuntimeException("Invalid password");
+        }
+
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
+        return new AuthResponse(token, user.getRole().name());
+    }
+}

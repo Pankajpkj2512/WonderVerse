@@ -1,0 +1,5 @@
+package com.wonderverse.config;
+
+public class SecurityConfig {
+
+}

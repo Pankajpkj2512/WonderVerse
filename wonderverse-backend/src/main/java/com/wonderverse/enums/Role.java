@@ -1,0 +1,7 @@
+package com.wonderverse.enums;
+
+public enum Role {
+    ADMIN,
+    PARENT,
+    CHILD
+}

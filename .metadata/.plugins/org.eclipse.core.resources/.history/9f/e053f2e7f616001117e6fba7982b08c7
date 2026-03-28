@@ -1,0 +1,5 @@
+package com.wonderverse.entity;
+
+public class User {
+
+}
