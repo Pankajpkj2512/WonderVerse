@@ -1,7 +1,4 @@
-
 WonderVerse project prompt with structure and overview by chatgpt
-
-<!--
 a children’s OTT platform like WonderVerse has huge potential 🚀
 
 Below is a detailed, professional project prompt you can use for:
@@ -119,6 +116,7 @@ Remove inappropriate content
 Manage users
 
 🗃️ Database Design (MySQL Tables)
+
 1. users
 
 id (PK)
@@ -516,5 +514,3 @@ A super-advanced enterprise-level prompt
 A microservices architecture version
 
 Or a hackathon-optimized version 🚀
-  -->
-

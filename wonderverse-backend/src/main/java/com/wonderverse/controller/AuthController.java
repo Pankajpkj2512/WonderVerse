@@ -1,9 +1,10 @@
 package com.wonderverse.controller;
 
-import com.wonderverse.dto.AuthRequest;
-import com.wonderverse.dto.AuthResponse;
+import com.wonderverse.dto.AuthDTO;
 import com.wonderverse.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,12 +15,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody AuthRequest request){
-        return authService.register(request);
+    public ResponseEntity<AuthDTO.AuthResponse> register(@Valid @RequestBody AuthDTO.RegisterRequest req) {
+        return ResponseEntity.ok(authService.register(req));
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody AuthRequest request){
-        return authService.login(request);
+    public ResponseEntity<AuthDTO.AuthResponse> login(@Valid @RequestBody AuthDTO.LoginRequest req) {
+        return ResponseEntity.ok(authService.login(req));
     }
 }

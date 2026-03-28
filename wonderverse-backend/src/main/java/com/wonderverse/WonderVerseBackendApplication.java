@@ -2,12 +2,12 @@ package com.wonderverse;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
+@EnableCaching
 public class WonderVerseBackendApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(WonderVerseBackendApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(WonderVerseBackendApplication.class, args);
+    }
 }

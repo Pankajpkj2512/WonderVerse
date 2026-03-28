@@ -1,11 +1,9 @@
 package com.wonderverse.service;
 
+import com.wonderverse.dto.AuthDTO;
 import com.wonderverse.entity.User;
-import com.wonderverse.enums.Role;
 import com.wonderverse.repository.UserRepository;
-import com.wonderverse.dto.AuthRequest;
-import com.wonderverse.dto.AuthResponse;
-import com.wonderverse.util.JwtUtil;
+import com.wonderverse.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,34 +16,38 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse register(AuthRequest request) {
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new RuntimeException("Email already exists");
-        }
-
+    public AuthDTO.AuthResponse register(AuthDTO.RegisterRequest req) {
+        if (userRepository.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already registered");
         User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.PARENT) // default role
+                .name(req.getName())
+                .email(req.getEmail())
+                .password(passwordEncoder.encode(req.getPassword()))
+                .role(req.getRole() != null ? req.getRole() : User.Role.PARENT)
                 .build();
-
-        userRepository.save(user);
-
+        user = userRepository.save(user);
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
-
-        return new AuthResponse(token, user.getRole().name());
+        return buildResponse(user, token);
     }
 
-    public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new RuntimeException("Invalid password");
-        }
-
+    public AuthDTO.AuthResponse login(AuthDTO.LoginRequest req) {
+        User user = userRepository.findByEmail(req.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        if (!passwordEncoder.matches(req.getPassword(), user.getPassword()))
+            throw new RuntimeException("Invalid email or password");
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        return buildResponse(user, token);
+    }
 
-        return new AuthResponse(token, user.getRole().name());
+    private AuthDTO.AuthResponse buildResponse(User user, String token) {
+        return AuthDTO.AuthResponse.builder()
+                .token(token)
+                .user(AuthDTO.UserInfo.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .role(user.getRole().name())
+                        .build())
+                .build();
     }
 }
